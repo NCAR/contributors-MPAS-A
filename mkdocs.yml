@@ -1,11 +1,11 @@
 # ------------------------------------
 # -------- Project Information -------
 # ------------------------------------
-site_name: NCAR MkDocs Template
-site_description: A template for creating NCAR mkdocs
-repo_url: https://github.com/NCAR/NCAR_mkdocs_template/
-site_url: https://NCAR.github.io/NCAR_mkdocs_template/
-site_author: CISL CSG (Consulting Services Group)
+site_name: MPAS-A Contributors Guide
+site_description: A comprehensive guide for contributing to the MPAS-A atmospheric model
+repo_url: https://github.com/MPAS-Dev/MPAS-Model/
+site_url: https://mpas-dev.github.io/contributors-guide/
+site_author: MPAS Development Team
 edit_uri: edit/main/docs/
 
 # directories to watch for automatic rebuilding when running "mkdocs serve"
@@ -33,7 +33,7 @@ validation:
 # ------------------------------------
 nav:
   - Home : index.md
-
+  - Contributing Guide: CONTRIBUTING.md
   - How to Use This Template?: getting-started.md
 
 # ------------------------------------
