@@ -17,7 +17,7 @@ Welcome to the Model for Prediction Across Scales - Atmosphere (MPAS-A) project!
 
 ### Code Quality and Standards
 - [So you want to write Fortran code](#so-you-want-to-write-fortran-code)
-- [So you want to write effective commit messages](#so-you-want-to-write-effective-commit-messages)
+- [So you need to write a commit message](#so-you-need-to-write-a-commit-message)
 - [So you want to add documentation](#so-you-want-to-add-documentation)
 - [So you want to add tests](#so-you-want-to-add-tests)
 
