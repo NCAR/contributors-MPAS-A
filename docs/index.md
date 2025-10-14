@@ -25,6 +25,3 @@ The Model for Prediction Across Scales - Atmosphere (MPAS-A) is a non-hydrostati
 
 This documentation is built using the [NCAR MkDocs Template](https://github.com/NCAR/NCAR_mkdocs_template) with the customized Material for MkDocs theme. The theme files have been customized to align with NCAR branding and colors and are available in the [NCAR_mkdocs_material_themes](https://github.com/NCAR/NCAR_mkdocs_material_themes) repository.
 
-For detailed information on how to use this template for your own documentation, please visit the [How to Use this Template](getting-started) page.
-
-If you have any questions regarding this workflow, please feel free to reach out to [CISL Consulting Services Group](mailto:csg@ucar.edu) for assistance.

@@ -17,6 +17,7 @@ Welcome to the Model for Prediction Across Scales - Atmosphere (MPAS-A) project!
 
 ### Code Quality and Standards
 - [So you want to write Fortran code](#so-you-want-to-write-fortran-code)
+- [So you want to write effective commit messages](#so-you-want-to-write-effective-commit-messages)
 - [So you want to add documentation](#so-you-want-to-add-documentation)
 - [So you want to add tests](#so-you-want-to-add-tests)
 
@@ -78,6 +79,9 @@ Before contributing, ensure you have:
 ### Environment Setup and Building
 
 For detailed instructions on setting up your development environment and building MPAS-A, please refer to the [MPAS Atmosphere User's Guide](https://www2.mmm.ucar.edu/projects/mpas/site/documentation/users_guide.html). The User's Guide provides comprehensive information on:
+
+![MPAS-A Build Process](assets/mpas-build-process.png)
+*Typical MPAS-A build workflow showing compilation steps and dependencies*
 
 - **Quick Start Guide**: High-level description of building and running MPAS-A
 - **Building MPAS**: Complete setup instructions including prerequisites and compilation
@@ -313,6 +317,194 @@ end module example_module
 - **Explicit Interfaces**: Use `implicit none` and explicit interfaces
 - **Documentation**: Include comprehensive docstrings
 - **Error Handling**: Implement proper error checking
+
+---
+
+## So you need to write a commit message
+
+### Why Commit Messages Matter
+
+People on this project read your commit messages! You are not shouting into a void.
+
+When you're in the middle of coding, the process may seem incredibly memorable and vivid, but those details can slip away like a dream. Your commit message is the best time to capture what you did while it's fresh. 
+
+- **You're about to forget**: The debugging process fades quickly from memory
+- **Nobody else knows your process**: Your colleagues weren't there during your debugging journey
+- **Future you will thank you**: When you return to this code in 6 months, you'll need those details
+- **It's greppable history**: Well-structured messages make searching git history powerful
+
+### The 80-Character Rule
+
+The first 80 characters of your commit message are crucial for greppable logs. This line should contain the most important identifying information:
+
+- **Variable names** that were changed
+- **Module names** that were modified
+- **Specific compiler/version** information
+- **Key functionality** affected
+- **Critical debugging details**
+
+### Commit Message Structure
+
+```
+Short summary (max 80 characters)
+│
+├─ Variable names: temperature, pressure
+├─ Module: mpas_atm_core, mpas_physics
+├─ Compiler: gfortran-11.3.0, ifort-2021.5.0
+└─ Key info: GPU acceleration, memory optimization
+
+Detailed explanation of the work done:
+- What was the problem you were solving?
+- What debugging steps did you take?
+- What compiler flags or environment variables were critical?
+- What performance improvements were achieved?
+- What edge cases did you discover?
+- What would you do differently next time?
+```
+
+### Examples of Good Commit Messages
+
+#### Example 1: Bug Fix
+```
+Fix memory leak in mpas_atm_core temperature calculation (gfortran-11.3.0)
+
+The temperature array in mpas_atm_core was not being properly deallocated
+in the cleanup routine, causing memory leaks during long runs. This was
+discovered when running 72-hour simulations on Cheyenne with 1000+ cores.
+
+Debugging process:
+1. Used valgrind to identify the leak location
+2. Found that deallocate() was called but array was already deallocated
+3. Root cause: double deallocation due to shared pointer logic
+4. Solution: Added null check before deallocation
+
+Performance impact: Eliminated 2GB/hour memory leak
+Compiler flags used: -g -O2 -fcheck=all
+Test case: CONUS_12km_72h simulation
+```
+
+#### Example 2: Performance Optimization
+```
+Optimize OpenACC data transfer in mpas_physics microphysics (nvfortran-22.7)
+
+Reduced GPU data transfer overhead by 40% in Thompson microphysics scheme
+by implementing asynchronous data movement and kernel fusion.
+
+Key changes:
+- Fused separate kernels for rain/snow/graupel calculations
+- Added async data transfers with proper synchronization
+- Optimized memory layout for GPU access patterns
+
+Performance results:
+- Data transfer time: 2.3s → 1.4s (40% reduction)
+- Total kernel time: 8.7s → 7.1s (18% reduction)
+- Memory bandwidth: 180 GB/s → 220 GB/s
+
+Compiler flags: -acc -gpu=cc80 -Minfo=accel
+Hardware: NVIDIA A100, 8 GPUs, 32 MPI ranks
+Test case: Hurricane simulation, 3km resolution
+```
+
+#### Example 3: Feature Addition
+```
+Add GPU-accelerated advection scheme to mpas_operators (ifort-2021.5.0)
+
+Implemented OpenACC version of monotonic advection scheme for better
+performance on GPU architectures while maintaining bit-for-bit accuracy.
+
+Implementation details:
+- Ported mpas_tracer_advection_mono.F to use OpenACC directives
+- Added data management for tracer arrays and mesh variables
+- Implemented proper boundary condition handling for GPU kernels
+- Added fallback to CPU version for unsupported configurations
+
+Validation:
+- Bit-for-bit accuracy compared to CPU version
+- Performance: 3.2x speedup on V100 GPUs
+- Memory usage: 15% increase due to device arrays
+
+Dependencies: OpenACC 3.0+, PGI/NVIDIA compilers
+Test cases: All standard MPAS test suite passes
+```
+
+### What to Include in Detailed Explanations
+
+#### Problem Context
+- What was the original issue or requirement?
+- What symptoms were you seeing?
+
+#### Debugging Journey
+- What tools did you use? (gdb, valgrind, profilers, etc.)
+- What compiler flags were critical?
+- What environment variables mattered?
+- What test cases revealed the issue?
+
+#### Technical Details
+- Specific variable names and their roles
+- Module dependencies and interactions
+- Memory layout considerations
+- Performance characteristics
+- Edge cases discovered
+
+#### Lessons Learned
+- What would you do differently next time?
+- What patterns should others follow?
+- What gotchas should be avoided?
+- What documentation is missing?
+
+### Anti-Patterns to Avoid
+
+#### ❌ Vague Messages
+```bash
+# Bad
+git commit -m "Fix bug"
+git commit -m "Update code"
+git commit -m "Changes"
+```
+
+#### ❌ Missing Context
+```bash
+# Bad - no debugging info
+git commit -m "Fix temperature calculation"
+```
+
+#### ❌ No Technical Details
+```bash
+# Bad - no compiler/environment info
+git commit -m "Add GPU support"
+```
+
+
+### Grep-Friendly Patterns
+
+Structure your messages to be easily searchable:
+
+```bash
+# Search for specific variables
+git log --grep="temperature"
+
+# Search for specific modules
+git log --grep="mpas_atm_core"
+
+# Search for compiler issues
+git log --grep="gfortran"
+
+# Search for performance improvements
+git log --grep="optimize\|performance\|speedup"
+
+# Search for GPU-related changes
+git log --grep="GPU\|OpenACC\|CUDA"
+```
+
+### Remember: You're Writing for Future You
+
+When you write a commit message, imagine yourself 6 months from now:
+- Will you understand what you did?
+- Will you remember why you made those specific choices?
+- Will you know what to avoid if you encounter similar issues?
+- Will your colleagues understand the context and reasoning?
+
+The few extra minutes you spend writing a detailed commit message will save hours of debugging and re-discovery in the future.
 
 ---
 
