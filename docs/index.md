@@ -11,7 +11,7 @@ The Model for Prediction Across Scales - Atmosphere (MPAS-A) is a non-hydrostati
 ## Quick Start
 
 - **New to MPAS-A?** Start with our [Contributing Guide](CONTRIBUTING.md) to understand the project structure and contribution workflow
-- **Ready to contribute?** Check out the "So you want to..." sections in our guide for specific tasks
+- **Ready to contribute?** Check out the organized sections in our guide for specific tasks
 - **Need help?** Visit our [support forum](http://forum.mmm.ucar.edu/) or [GitHub discussions](https://github.com/MPAS-Dev/MPAS-Model/discussions)
 
 ## Key Resources

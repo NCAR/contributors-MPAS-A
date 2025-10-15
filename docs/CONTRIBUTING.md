@@ -7,11 +7,19 @@ Welcome to the Model for Prediction Across Scales - Atmosphere (MPAS-A) project!
 ### Quick Start
 - [Getting Started](#getting-started)
 - [Development Workflow](#development-workflow)
+- [Codebase Structure](#codebase-structure)
 
 ### Code Standards
 - [Fortran Guidelines](#fortran-guidelines)
 - [Things Not to Do](#things-not-to-do)
 - [Testing](#testing)
+- [Adding Documentation](#adding-documentation)
+
+### Development Tasks
+- [Starting a New Feature](#starting-a-new-feature)
+- [Fixing a Bug](#fixing-a-bug)
+- [Optimizing Modules](#optimizing-modules)
+- [Adding GPU Acceleration](#adding-gpu-acceleration)
 
 ### Collaboration
 - [Commit Messages](#commit-messages)
@@ -88,7 +96,7 @@ For detailed instructions on setting up your development environment and buildin
 
 ---
 
-## So you want to understand the codebase structure
+## Codebase Structure
 
 ### High-Level Directory Structure
 
@@ -123,7 +131,7 @@ core_atmosphere/
 
 ---
 
-## So you want to start a new feature
+## Starting a New Feature
 
 ### 1. Create a Feature Branch
 
@@ -160,7 +168,7 @@ git checkout -b feature/your-feature-name
 
 ---
 
-## So you want to fix a bug
+## Fixing a Bug
 
 ### 1. Reproduce the Bug
 
@@ -190,7 +198,7 @@ git checkout -b bugfix/describe-the-bug
 
 ---
 
-## So you want to optimize an existing module
+## Optimizing Modules
 
 ### 1. Profile the Code
 
@@ -223,7 +231,7 @@ git checkout -b bugfix/describe-the-bug
 
 ---
 
-## So you want to add GPU acceleration
+## Adding GPU Acceleration
 
 ### 1. Understand GPU Programming
 
@@ -501,7 +509,7 @@ The few extra minutes you spend writing a detailed commit message will save hour
 
 ---
 
-## So you want to add documentation
+## Adding Documentation
 
 ### FORD Documentation Style
 

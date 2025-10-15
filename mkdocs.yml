@@ -34,7 +34,6 @@ validation:
 nav:
   - Home : index.md
   - Contributing Guide: CONTRIBUTING.md
-  - How to Use This Template?: getting-started.md
 
 # ------------------------------------
 # -- configuration - themes
