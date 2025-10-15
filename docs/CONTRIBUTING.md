@@ -4,36 +4,29 @@ Welcome to the Model for Prediction Across Scales - Atmosphere (MPAS-A) project!
 
 ## Table of Contents
 
-### Getting Started
-- [So you want to contribute to MPAS-A](#so-you-want-to-contribute-to-mpas-a)
-- [So you want to set up your development environment](#so-you-want-to-set-up-your-development-environment)
-- [So you want to understand the codebase structure](#so-you-want-to-understand-the-codebase-structure)
+### Quick Start
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
 
-### Development Workflows
-- [So you want to start a new feature](#so-you-want-to-start-a-new-feature)
-- [So you want to fix a bug](#so-you-want-to-fix-a-bug)
-- [So you want to optimize an existing module](#so-you-want-to-optimize-an-existing-module)
-- [So you want to add GPU acceleration](#so-you-want-to-add-gpu-acceleration)
-
-### Code Quality and Standards
-- [So you want to write Fortran code](#so-you-want-to-write-fortran-code)
-- [So you need to write a commit message](#so-you-need-to-write-a-commit-message)
-- [So you want to add documentation](#so-you-want-to-add-documentation)
-- [So you want to add tests](#so-you-want-to-add-tests)
+### Code Standards
+- [Fortran Guidelines](#fortran-guidelines)
+- [Things Not to Do](#things-not-to-do)
+- [Testing](#testing)
 
 ### Collaboration
-- [So you want to submit a pull request](#so-you-want-to-submit-a-pull-request)
-- [So you want to review code](#so-you-want-to-review-code)
-- [So you want to report an issue](#so-you-want-to-report-an-issue)
+- [Commit Messages](#commit-messages)
+- [Pull Requests](#pull-requests)
+- [Code Review](#code-review)
+- [Getting Help](#getting-help)
 
-### Important Guidelines
-- [Things not to do](#things-not-to-do)
+### Resources
+- [Official Resources](#official-resources)
+- [Development Resources](#development-resources)
 - [Code of Conduct](#code-of-conduct)
-- [Resources and Support](#resources-and-support)
 
 ---
 
-## So you want to contribute to MPAS-A
+## Getting Started
 
 ### What is MPAS-A?
 
@@ -61,7 +54,7 @@ The software is open source and copyrighted under a BSD license, making it freel
 
 ---
 
-## So you want to set up your development environment
+## Development Workflow
 
 ### Prerequisites
 
@@ -270,7 +263,7 @@ end do
 
 ---
 
-## So you want to write Fortran code
+## Fortran Guidelines
 
 ### Modern Fortran Standards
 
@@ -320,7 +313,7 @@ end module example_module
 
 ---
 
-## So you need to write a commit message
+## Commit Messages
 
 ### Why Commit Messages Matter
 
@@ -542,7 +535,7 @@ Use the FORD tool for generating documentation:
 
 ---
 
-## So you want to add tests
+## Testing
 
 ### Test Types
 
@@ -589,7 +582,7 @@ end program test_example
 
 ---
 
-## So you want to submit a pull request
+## Pull Requests
 
 ### 1. Prepare Your Changes
 
@@ -637,7 +630,7 @@ Brief description of changes
 
 ---
 
-## So you want to review code
+## Code Review
 
 ### Review Checklist
 
@@ -668,7 +661,7 @@ Brief description of changes
 
 ---
 
-## So you want to report an issue
+## Getting Help
 
 ### Before Reporting
 
@@ -712,7 +705,7 @@ Any other relevant information
 
 ---
 
-## Things not to do
+## Things Not to Do
 
 ### Code Quality Issues
 
@@ -963,7 +956,7 @@ If you experience or witness unacceptable behavior, please report it to the proj
 
 ---
 
-## Resources and Support
+## Resources
 
 ### Official Resources
 
