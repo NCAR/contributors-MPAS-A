@@ -1,6 +1,8 @@
 # MPAS-A Contributors Guide
 
-Welcome to the Model for Prediction Across Scales - Atmosphere (MPAS-A) project! This guide is designed to help you contribute effectively to the MPAS-A codebase, whether you're adding new physics schemes, modifying the dynamical core, or integrating new analysis tools.
+Welcome to the Model for Prediction Across Scales - Atmosphere (MPAS-A) project! **This guide is designed to help you contribute effectively to the MPAS-A codebase,** whether you're adding new physics schemes, modifying the dynamical core, or integrating new analysis tools. 
+
+If you're trying to build and run the existing MPAS-A code, then the [MPAS-A User guide](https://www2.mmm.ucar.edu/projects/mpas/site/documentation/users_guide.html) is probably a better resource for you. Thank you!
 
 ## Table of Contents
 
