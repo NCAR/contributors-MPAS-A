@@ -267,7 +267,7 @@ end do
 
 ### 5. Testing and Optimization
 
-- **Correctness**: Verify results match CPU implementation
+- **Correctness**: Validate statistical equivalence with CPU via ECT (PyCECT) — GPU results are not expected to be bit-for-bit identical
 - **Performance**: Measure speedup and identify bottlenecks
 - **Memory Usage**: Monitor GPU memory consumption
 
