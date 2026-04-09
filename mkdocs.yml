@@ -3,8 +3,8 @@
 # ------------------------------------
 site_name: MPAS-A Contributors Guide
 site_description: A comprehensive guide for contributing to the MPAS-A atmospheric model
-repo_url: https://github.com/MPAS-Dev/MPAS-Model/
-site_url: https://mpas-dev.github.io/contributors-guide/
+repo_url: https://github.com/NCAR/contributors-MPAS-A/
+site_url: https://contributors-mpas-a.readthedocs.io/
 site_author: MPAS Development Team
 edit_uri: edit/main/docs/
 
