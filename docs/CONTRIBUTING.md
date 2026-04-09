@@ -590,6 +590,8 @@ end program test_example
 - **Test Coverage**: Aim for comprehensive coverage
 - **Regression Testing**: Prevent reintroduction of bugs
 
+**MPAS-A CI on GitHub** is implemented in the [**MPAS-Model-CI**](https://github.com/NCAR/MPAS-Model-CI) repository (not only in MPAS-Model). It runs **subset** tests (e.g. MPICH-based compilers on pull requests), **ensemble consistency (PyCECT)** on short runs, **bit-for-bit** checks where configured, and **optional** GPU or OpenMPI workflows that are often **manual dispatch** only. See the **[CI/CD System](ci-cd.md)** page for a contributor-oriented summary and links to the maintainer **[`AGENT_GUIDE.md`](https://github.com/NCAR/MPAS-Model-CI/blob/master/.github/AGENT_GUIDE.md)**.
+
 ---
 
 ## Pull Requests

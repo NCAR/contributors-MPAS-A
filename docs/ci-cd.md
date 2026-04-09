@@ -1,420 +1,165 @@
 # MPAS-A CI/CD System
 
-This page documents the Continuous Integration and Continuous Deployment (CI/CD) infrastructure for MPAS-A, based on the work in the [MPAS-Model-CI repository](https://github.com/NCAR/MPAS-Model-CI).
+This page describes the **continuous integration** for MPAS-A as implemented in the [**MPAS-Model-CI**](https://github.com/NCAR/MPAS-Model-CI) repository (GitHub Actions, containers, test data). The CI code and the authoritative maintainer reference live there — in particular **[`AGENT_GUIDE.md`](https://github.com/NCAR/MPAS-Model-CI/blob/master/.github/AGENT_GUIDE.md)**.
+
+This contributors guide summarizes behavior for **developers**; when in doubt, follow the CI repo and `AGENT_GUIDE.md`.
+
+---
 
 ## Overview
 
-The MPAS-A CI/CD system provides automated testing infrastructure to:
+MPAS-Model-CI provides:
 
-- **Build MPAS-A** across multiple compiler and MPI combinations
-- **Run test cases** to validate model correctness
-- **Validate results** against reference outputs
-- **Support GPU acceleration** testing with OpenACC
-
-The system leverages GitHub Actions workflows and NCAR's containerized development environments to ensure consistent, reproducible builds and tests.
+| Capability | Notes |
+|------------|--------|
+| **Multi-compiler builds** | GCC, Intel oneAPI, NVHPC in Docker (`hpcdev`) |
+| **CPU subset testing** | MPICH-based workflows on **push/PR** to default branches |
+| **Ensemble Consistency Test (ECT)** | [PyCECT](https://github.com/NCAR/PyCECT) statistical validation — **not** bitwise identity to a single golden log |
+| **Bit-for-bit (BFB) tests** | Optional workflows comparing NetCDF history variable data (I/O path, MPI decomposition, etc.) |
+| **GPU (OpenACC)** | Full runs on NCAR **CIRRUS** self-hosted runners; **compile-only** NVHPC+CUDA check on GitHub-hosted runners |
+| **Coverage & unit tests** | GCC coverage (`coverage.yml`); pFUnit (`unit-tests.yml`) |
 
 ---
 
-## Architecture
+## Where things live
 
-### Workflow Structure
+| Location | Purpose |
+|----------|---------|
+| [`.github/workflows/`](https://github.com/NCAR/MPAS-Model-CI/tree/master/.github/workflows) | Caller workflows + **reusable** workflows (`_*`) |
+| [`.github/actions/`](https://github.com/NCAR/MPAS-Model-CI/tree/master/.github/actions) | Composite actions: build, run, download test data, ECT validation, etc. |
+| [`.github/ci-config.env`](https://github.com/NCAR/MPAS-Model-CI/blob/master/.github/ci-config.env) | Central configuration: image templates, release tags for test assets, MPI flags, Makefile targets |
+| [`.github/AGENT_GUIDE.md`](https://github.com/NCAR/MPAS-Model-CI/blob/master/.github/AGENT_GUIDE.md) | Workflow map, conventions, how to add test cases |
 
-The CI/CD pipeline consists of three main jobs that run sequentially:
+---
+
+## Architecture (subset CPU / ECT)
+
+Thin **caller** workflows (e.g. `test-gcc-mpich.yml`, `test-nvhpc-mpich.yml`) invoke the reusable workflow **`_test-compiler.yml`**. A typical high-level flow:
 
 ```mermaid
 graph LR
-    A[Build Job] --> B[Run Job]
-    B --> C[Validation Job]
-    C --> D[Cleanup Job]
+    A[config: resolve container] --> B[build MPAS-A]
+    B --> C[ECT: 3 perturbed members]
+    C --> D[PyCECT validate]
+    D --> E[cleanup artifacts]
 ```
 
-1. **Build Job**: Compiles MPAS-A with various compiler/MPI/IO combinations
-2. **Run Job**: Executes the 240km test case with built executables
-3. **Validation Job**: Compares output logs against reference standards
-4. **Cleanup Job**: Removes temporary artifacts
-
-### Container Environment
-
-The CI system uses NCAR CISL development containers, which provide pre-configured environments with:
-
-- Compilers (GCC, Intel oneAPI, NVIDIA HPC SDK)
-- MPI implementations (MPICH, OpenMPI)
-- I/O libraries (PIO, NetCDF, Parallel-NetCDF)
-- CUDA toolkit (for GPU builds)
-
-Container images follow the naming convention:
-```
-ncarcisl/cisldev-{arch}-{os}-{compiler}-{mpi}[-cuda]:devel
-```
-
-For example: `ncarcisl/cisldev-x86_64-almalinux9-nvhpc-mpich3-cuda:devel`
+- **Build** uses the **`build-mpas`** composite action (double precision, SMIOL by default for subset runs).
+- **Run** uses **`run-perturb-mpas`** for three ensemble members (four MPI ranks each for the standard subset).
+- **Validate** uses **`validate-ect`** against a **precomputed ensemble summary** file shipped as a GitHub release asset (not a hand-maintained “golden log” in the repo tree).
 
 ---
 
-## Build Matrix
+## Containers
 
-The CI system tests MPAS-A across multiple configurations:
+Images are **`docker.io/ncarcisl/hpcdev-x86_64`** tags resolved from templates in **`ci-config.env`**, for example:
 
-### Supported Compilers
+- **CPU:** `almalinux9-{compiler}-{mpi}-26.02` (with mappings such as `gcc` → `gcc14` in `ci-config.env`).
+- **GPU:** `almalinux9-{compiler}-{mpi}-cuda-26.02`.
+- **Intel** may use a **pinned** `leap-oneapi-*-25.09` image to avoid known compiler regressions — see comments in `ci-config.env`.
 
-| Compiler | Target | GPU Support |
-|----------|--------|-------------|
-| GCC (gfortran) | `gfortran` | No |
-| Intel oneAPI | `intel` | No |
-| NVIDIA HPC SDK | `nvhpc` | Yes (OpenACC) |
-
-### Supported MPI Implementations
-
-| MPI | Environment Variable |
-|-----|---------------------|
-| MPICH | `MPI_IMPL=mpich` |
-| OpenMPI | `MPI_IMPL=openmpi` |
-
-### I/O Options
-
-| I/O Library | Configuration |
-|-------------|---------------|
-| PIO | `USE_PIO2=true`, `PIO_ROOT=/container/pio` |
-| SMIOL | `USE_PIO2=false` |
-
-### GPU Options
-
-| Mode | Configuration |
-|------|---------------|
-| CPU only | `OPENACC=false` (default) |
-| GPU (CUDA) | `OPENACC=true` (nvhpc only) |
+The **`resolve-container`** composite action substitutes `{compiler}` and `{mpi}` into those templates.
 
 ---
 
-## Workflows
+## Workflow triggers (policy)
 
-### Main Build and Run Workflow
+| Class | Typical trigger | Purpose |
+|-------|-------------------|---------|
+| **MPICH CPU subsets** (`test-*-mpich.yml` for gcc/intel/nvhpc) | `push` / `pull_request` to **`master`** / **`develop`** | Fast feedback on PRs |
+| **OpenMPI CPU** (`test-*-openmpi.yml`) | Often **`workflow_dispatch`** only | Same science checks; avoids noisy failures / resource use on every PR |
+| **GPU ECT** (`test-gpu-*.yml`) | **`workflow_dispatch`** | Runs on self-hosted GPU runners; **not** tied to `pull_request` for security/policy |
+| **NVHPC + CUDA compile-only** (`compile-nvhpc-cuda-mpich.yml`) | `push` / `pull_request` | Catches **toolchain** breakage without needing a GPU |
+| **BFB** (`bfb-*.yml`) | **`workflow_dispatch`** and sometimes `push` to feature branches | Bitwise / NetCDF-variable checks |
 
-The primary workflow (`CIRRUS_build_run240.yml`) performs comprehensive testing:
-
-```yaml
-name: (CIRRUS, cisldev) - Build MPAS-A and run 240km test case
-
-on:
-  workflow_dispatch:
-    inputs:
-      os:
-        description: 'Base OS'
-        type: choice
-        required: true
-        default: almalinux9
-        options:
-          - almalinux8
-          - almalinux9
-          - almalinux10
-          - leap
-          - tumbleweed
-          - noble
-```
-
-#### Build Job Configuration
-
-The build job uses a strategy matrix to test multiple configurations:
-
-```yaml
-strategy:
-  fail-fast: false
-  max-parallel: 4
-  matrix:
-    compiler: [ nvhpc, oneapi, gcc ]
-    mpi: [ mpich3, openmpi ]
-    gpu: [ cuda, nogpu ]
-    io: [ smiol, pio ]
-    arch: [ x86_64 ]
-
-    exclude:
-      - compiler: gcc
-        gpu: cuda
-      - compiler: oneapi
-        gpu: cuda
-```
-
-!!! note "GPU Build Exclusions"
-    GPU builds with CUDA are only supported with the NVIDIA HPC SDK (`nvhpc`) compiler, as it provides OpenACC support. GCC and Intel oneAPI builds skip the CUDA configuration.
-
-#### Run Job Configuration
-
-The run job downloads built executables and runs the 240km test case:
-
-```yaml
-strategy:
-  matrix:
-    compiler: [ nvhpc, oneapi, gcc ]
-    mpi: [ mpich3, openmpi ]
-    gpu: [ cuda, nogpu ]
-    io: [ smiol, pio ]
-    num_procs: [ 1 ]
-```
+Exact `on:` blocks are in each YAML file; treat `AGENT_GUIDE.md` as the living summary.
 
 ---
 
-## Build Process
+## Validation: ECT vs BFB
 
-### Build Script
+### Ensemble Consistency Test (ECT)
 
-The `build_mpas.sh` script handles compilation:
+- **What it does:** Compares **perturbed** short simulations against a **stored PyCECT ensemble summary** (statistical consistency across members).
+- **Typical resolution:** **120km** for subset ECT (see `ECT_RESOLUTION` and related variables in `ci-config.env`).
+- **What it is not:** A check that logs or fields match a single reference run **bit-for-bit**; that is **BFB** (below).
 
-```bash
-#!/usr/bin/env bash
-set -ex
+### Bit-for-bit (BFB)
 
-# Source common configuration
-source ${SCRIPTDIR}/build_common.cfg
-
-# Map compiler family to MPAS make target
-case "${COMPILER_FAMILY}" in
-    "aocc"|"clang") compiler_target="llvm" ;;
-    "gcc")          compiler_target="gfortran" ;;
-    "oneapi")       compiler_target="intel" ;;
-    "nvhpc")        compiler_target="nvhpc" ;;
-esac
-
-# Build MPAS-A
-make ${compiler_target} CORE=atmosphere --jobs ${MAKE_J_PROCS:-$(nproc)}
-```
-
-### Build Configuration
-
-Environment variables control the build:
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `COMPILER_FAMILY` | Compiler being used | `gcc`, `nvhpc`, `oneapi` |
-| `USE_PIO2` | Enable PIO library | `true` or `false` |
-| `PIO_ROOT` | Path to PIO installation | `/container/pio` |
-| `OPENACC` | Enable OpenACC for GPU | `true` or `false` |
-| `MAKE_J_PROCS` | Parallel make jobs | Number or `$(nproc)` |
+- **What it does:** Compares **history NetCDF** variable data between runs that should be identical (e.g. different PIO vs SMIOL build, or different MPI rank counts).
+- **Implementation:** Reusable **`_test-bfb.yml`** with a **`variants`** JSON array; comparison uses **`compare-bfb-nc.py`**.
+- **Default resolution** for many BFB callers: **240km** (`BFB_*` in `ci-config.env`).
+- **GPU BFB** (when present): NVHPC + CUDA + OpenACC, **dispatch-only** on CIRRUS — same policy as GPU ECT.
 
 ---
 
-## Test Case: 240km Global
+## Test case data (GitHub releases)
 
-The CI system uses a 240km resolution global test case for validation.
+Test meshes and namelists are **not** committed as large tarballs under `.github/workflows/`. Instead:
 
-### Run Script
+1. Archives are **`{resolution}.tar.gz`** attached to **GitHub releases** on **MPAS-Model-CI** (e.g. tags like `testdata-240km-v1`).
+2. **`ci-config.env`** defines **`RELEASE_TESTDATA_{RES}`** (resolution uppercased, `-` → `_`).
+3. **`download-testdata`** downloads and caches the archive for the job.
 
-The `run_mpas_240km.sh` script executes the test:
-
-```bash
-#!/usr/bin/env bash
-set -ex
-
-# Parse arguments
-NUM_PROCS="${1:-${NUM_PROCS:-1}}"
-RUN_DURATION="${2:-${RUN_DURATION:-0_06:00:00}}"
-RESTART_INTERVAL="${3:-${RESTART_INTERVAL:-0_06:00:00}}"
-
-# Set MPI flags for OpenMPI in containers
-if [ "${MPI_IMPL}" = "openmpi" ]; then
-    MPI_FLAGS="${MPI_FLAGS} --allow-run-as-root"
-fi
-
-# Extract test case
-tar xzf .github/workflows/240km.tar.gz
-mv 240km 240km_${NUM_PROCS}
-cd 240km_${NUM_PROCS}/
-
-# Link executable
-ln -sf ../atmosphere_model .
-
-# Configure run duration
-sed -i "s/config_run_duration = '[^']*'/config_run_duration = '${RUN_DURATION}'/" namelist.atmosphere
-
-# Set stack size for Intel Fortran
-ulimit -s unlimited 2>/dev/null || true
-
-# Run the model
-mpirun -n "$NUM_PROCS" $MPI_FLAGS ./atmosphere_model
-```
-
-### Run Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `NUM_PROCS` | 1 | Number of MPI processes |
-| `RUN_DURATION` | `0_06:00:00` | Simulation duration (DD_HH:MM:SS) |
-| `RESTART_INTERVAL` | `0_06:00:00` | Restart file output interval |
+**Adding a new resolution:** build the tarball, create a release with the asset, set the new `RELEASE_TESTDATA_*` variable, and point workflows at the new resolution — see **`AGENT_GUIDE.md`**.
 
 ---
 
-## Validation
+## GPU testing
 
-### Log Comparison
-
-The validation job compares run outputs against reference standards:
-
-```yaml
-- name: Compare logs against reference
-  run: |
-    python .github/workflows/validation/compare_logs.py \
-      logs \
-      .github/workflows/validation/reference_log.atmosphere.0000.out
-```
-
-### Validation Criteria
-
-The validation system checks:
-
-- **Completion status**: Model ran to completion without errors
-- **Output values**: Key diagnostic values match reference within tolerance
-- **Timing information**: Run completed within expected timeframe
+- **Full GPU ECT:** **`_test-gpu.yml`** — OpenACC build, runs on **`CIRRUS-4x8-gpu`**, validates with PyCECT.
+- **Compile-only:** **`compile-nvhpc-cuda-mpich.yml`** — builds with OpenACC in a CUDA **container** on **GitHub-hosted** `ubuntu-latest` (no GPU execution).
 
 ---
 
-## Artifacts
+## Known issues (informal)
 
-### Build Artifacts
-
-Each build produces an executable artifact:
-
-```yaml
-- name: Upload atmosphere_model executable
-  uses: actions/upload-artifact@v4
-  with:
-    name: atmosphere_model-${{ matrix.compiler }}_${{ matrix.mpi }}_${{ matrix.gpu }}_${{ matrix.io }}
-    path: atmosphere_model
-```
-
-Artifact naming convention: `atmosphere_model-{compiler}_{mpi}_{gpu}_{io}`
-
-### Run Artifacts
-
-Each run produces log files:
-
-```yaml
-- name: Upload log files
-  uses: actions/upload-artifact@v4
-  with:
-    name: mpas_240km_{num_procs}rank_logs_{compiler}_{mpi}_{gpu}_{io}
-    path: |
-      240km_*/log.*
-```
-
-### Cleanup
-
-Executable artifacts are cleaned up after validation to save storage:
-
-```yaml
-- name: Delete all executable artifacts
-  uses: geekyeggo/delete-artifact@v5
-  with:
-    name: atmosphere_model-*
-    failOnError: false
-```
+- **NVHPC + OpenMPI** on some GitHub-hosted runners has shown **runtime/MPI** problems (e.g. exit 134); **MPICH** subsets are the primary PR gate. Check CI docs and issues in MPAS-Model-CI for current status.
+- **Intel** images may stay on a **pinned** toolchain until upstream compiler issues are resolved — see **`ci-config.env`** comments.
 
 ---
 
-## Running Workflows
+## Artifacts and cleanup
 
-### GitHub Actions (Standard Runners)
-
-For workflows using standard GitHub-hosted runners:
-
-1. Navigate to the repository's **Actions** tab
-2. Select the desired workflow
-3. Click **Run workflow**
-4. Choose the base OS from the dropdown
-5. Click **Run workflow** to start
-
-### CIRRUS (NCAR HPC Runners)
-
-For workflows using NCAR's CIRRUS infrastructure:
-
-1. Workflows run on the `CIRRUS-4x8-gpu` runner group
-2. These provide access to GPU resources for CUDA testing
-3. Higher resource limits for memory-intensive builds
-
-!!! warning "Runner Access"
-    CIRRUS runners require appropriate access permissions. Contact NCAR CISL for access to HPC-connected GitHub runners.
+Workflows upload **executables** and **history** or **logs** as GitHub Actions artifacts, then **delete** temporary artifacts in a cleanup job (often via the GitHub API) to save storage. Details vary by workflow; see the YAML files.
 
 ---
 
-## Extending the CI System
+## Extending CI
 
-### Adding a New Compiler
-
-1. Ensure the compiler is available in CISL containers
-2. Add the compiler to the workflow matrix:
-   ```yaml
-   compiler: [ nvhpc, oneapi, gcc, NEW_COMPILER ]
-   ```
-3. Update `build_mpas.sh` with the compiler target mapping:
-   ```bash
-   "new_compiler") compiler_target="new_target" ;;
-   ```
-
-### Adding a New Test Case
-
-1. Prepare the test case data as a tarball
-2. Add the tarball to `.github/workflows/`
-3. Create a new run script or modify `run_mpas_240km.sh`
-4. Update the workflow to include the new test
-
-### Adding Validation Checks
-
-1. Add reference outputs to `.github/workflows/validation/`
-2. Update `compare_logs.py` with new validation criteria
-3. Add appropriate tolerances for numerical comparisons
+1. Prefer **reusing** a composite action or reusable workflow before adding parallel job logic.
+2. Centralize new image names, release tags, and MPI flags in **`ci-config.env`**.
+3. **Document** changes in **`AGENT_GUIDE.md`** (MPAS-Model-CI) and open a PR against **MPAS-Model-CI**; then update **this page** if the contributor-facing summary changes.
 
 ---
 
 ## Troubleshooting
 
-### Common Build Issues
-
-#### Stack Size Errors (Intel Fortran)
+### Stack size (Intel Fortran)
 
 ```bash
-# Solution: Set unlimited stack size
 ulimit -s unlimited
 ```
 
-#### OpenMPI Root User Errors
+### OpenMPI in containers
 
-```bash
-# Solution: Add --allow-run-as-root flag
-mpirun --allow-run-as-root -n 4 ./atmosphere_model
-```
+MPI may be configured with flags such as **`--allow-run-as-root`** and **`--oversubscribe`** — see **`OPENMPI_RUN_FLAGS`** / `ci-config.env` and how **`run-mpas`** invokes **`mpirun`**.
 
-#### PIO Not Found
+### PIO vs SMIOL
 
-```bash
-# Solution: Set PIO environment variables
-export PIO_ROOT=/container/pio
-export USE_PIO2=true
-```
-
-### Debugging Failed Runs
-
-1. **Check the workflow logs** in GitHub Actions
-2. **Download log artifacts** for detailed output
-3. **Review the environment** using the "Interrogate Runtime Environment" step output
-4. **Compare against reference** logs for expected values
+Build-time: **`USE_PIO2`**, **`PIO_ROOT`** — see **`build-mpas`** and `ci-config.env`.
 
 ---
 
-## Related Resources
+## Related links
 
-- [MPAS-Model-CI Repository](https://github.com/NCAR/MPAS-Model-CI)
-- [NCAR CISL Docker Hub](https://hub.docker.com/u/ncarcisl)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Ben Kirk's Container Workflows](https://github.com/benkirk/demo_github_actions)
+- [**MPAS-Model-CI**](https://github.com/NCAR/MPAS-Model-CI) — repository
+- [**AGENT_GUIDE.md**](https://github.com/NCAR/MPAS-Model-CI/blob/master/.github/AGENT_GUIDE.md) — CI maintainer reference
+- [**ncarcisl/hpcdev on Docker Hub**](https://hub.docker.com/r/ncarcisl/hpcdev-x86_64)
+- [**GitHub Actions documentation**](https://docs.github.com/en/actions)
 
 ---
 
 ## Contributing to CI/CD
 
-Improvements to the CI/CD system are welcome! When contributing:
-
-1. **Test locally** using the CISL containers when possible
-2. **Use workflow_dispatch** for manual testing before automating triggers
-3. **Document changes** in workflow comments and this guide
-4. **Consider resource usage** - minimize unnecessary builds/runs
-5. **Follow the matrix pattern** for adding new configurations
-
-For questions about the CI/CD system, please open an issue in the [MPAS-Model-CI repository](https://github.com/NCAR/MPAS-Model-CI/issues).
+Improvements belong in **MPAS-Model-CI** (workflows, actions, `ci-config.env`, `AGENT_GUIDE.md`). Open issues or pull requests there; this **contributors-MPAS-A** repo only holds this **high-level** summary for MPAS-A contributors.
