@@ -84,6 +84,11 @@ Exact `on:` blocks are in each YAML file; treat `AGENT_GUIDE.md` as the living s
 - **Typical resolution:** **120km** for subset ECT (see `ECT_RESOLUTION` and related variables in `ci-config.env`).
 - **What it is not:** A check that logs or fields match a single reference run **bit-for-bit**; that is **BFB** (below).
 
+### Running ECT yourself (HPC, no Docker)
+
+CI uses **`hpcdev`** containers; for development on systems like **Derecho** or **Cheyenne**, you can run the **same PyCECT check** using your own modules, the **`120km`** test case and ECT assets from **MPAS-Model-CI** GitHub releases, and the **`perturb_theta.py` / `trim_history.py`** scripts in **MPAS-Model-CI**. Full step-by-step instructions (downloads, member loop, `pyCECT.py` command) are in **`AGENT_GUIDE.md`** in MPAS-Model-CI — section **“Running ECT without Docker (e.g. NCAR Derecho, Cheyenne)”**:  
+<https://github.com/NCAR/MPAS-Model-CI/blob/master/.github/AGENT_GUIDE.md>
+
 ### Bit-for-bit (BFB)
 
 - **What it does:** Compares **history NetCDF** variable data between runs that should be identical (e.g. different PIO vs SMIOL build, or different MPI rank counts).
