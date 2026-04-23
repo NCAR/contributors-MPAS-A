@@ -8,17 +8,13 @@ work, edit MPAS-Model-CI directly.
 
 ## What CI runs
 
-All jobs are defined and executed in **this CI repository**. They clone
-**MPAS-Dev/MPAS-Model** (or another fork) at a chosen ref when a workflow
-runs — including on `workflow_dispatch` with cross-repo inputs.
-
 | Capability | Notes |
 |------------|-------|
 | Multi-compiler builds | GCC, Intel oneAPI, NVHPC inside `hpcdev` containers |
-| CPU subset testing | MPICH + ECT when workflows run (see [Workflows](workflows.md)) |
+| CPU subset testing | MPICH workflows on every push and PR |
 | Ensemble Consistency Test (ECT) | Statistical validation via [PyCECT](https://github.com/NCAR/PyCECT) |
 | Bit-for-bit (BFB) tests | NetCDF variable comparison across configurations |
-| GPU (OpenACC) | Full ECT on **CIRRUS** (dispatch); NVHPC+CUDA compile-only on CI-repo push/PR |
+| GPU (OpenACC) | Full ECT on **CIRRUS** self-hosted runners; NVHPC+CUDA compile-only on every PR |
 | GPU profiling | Nsight Systems traces on dispatch |
 | Coverage & unit tests | GCC coverage to Codecov; pFUnit across GCC 12/13/14 |
 

@@ -1,11 +1,5 @@
 # Workflows & Triggers
 
-Triggers below apply to the **NCAR/MPAS-Model-CI** repository (the clone
-that receives the `push` / `pull_request` event), not to
-**MPAS-Dev/MPAS-Model**. To run checks against your model branch, use
-`workflow_dispatch` or cross-repo inputs — see
-[Cross-repo testing](#cross-repo-testing).
-
 A typical CPU subset run:
 
 ```mermaid
@@ -22,18 +16,17 @@ validation logic live in the reusable workflows and composite actions.
 
 | Class | Trigger | Notes |
 |-------|---------|-------|
-| `test-*-mpich` | push/PR to `master`, `develop` on **MPAS-Model-CI** | Subset + ECT when the CI repo changes |
+| `test-*-mpich` | push/PR to `master`, `develop` | Primary PR gate |
 | `test-*-openmpi` | dispatch | OpenMPI in containers is noisy |
 | `test-gpu-*` | dispatch | Self-hosted CIRRUS — security boundary |
-| `compile-nvhpc-cuda-mpich` | push/PR to `master`, `develop` on **MPAS-Model-CI** | OpenACC/CUDA compile-only, no GPU |
-| `ect-test` | push to `master` on **MPAS-Model-CI**; dispatch | Standalone ECT (GCC + OpenMPI, 120 km, GitHub-hosted) |
-| `bfb-*` (CPU) | `workflow_dispatch`; some callers also enable `push` on specific branches | Bit-for-bit — read each YAML |
+| `compile-nvhpc-cuda-mpich` | push/PR | OpenACC/CUDA toolchain check, no GPU |
+| `ect-test` | push to `master`; dispatch | Standalone ECT (GCC + OpenMPI, 120 km, GitHub-hosted) |
+| `bfb-*` (CPU) | dispatch; some callers also enable `push` on specific branches | Bit-for-bit — see each YAML |
 | `bfb-*-gpu`, `bfb-nvhpc-cpu-vs-gpu`, `profile-gpu-nsight` | dispatch | Inherit GPU policy |
-| `coverage` | push to `master` on **MPAS-Model-CI** | GCC coverage to Codecov |
-| `unit-tests` | push/PR to `master`, `develop` on **MPAS-Model-CI** | pFUnit across GCC 12/13/14 |
+| `coverage` | push to `master` | GCC coverage to Codecov |
+| `unit-tests` | push/PR | pFUnit across GCC 12/13/14 |
 
-Exact `on:` blocks live in each workflow file under
-[`.github/workflows/`](https://github.com/NCAR/MPAS-Model-CI/tree/master/.github/workflows).
+Exact `on:` blocks live in each workflow YAML.
 
 ## Cross-repo testing
 

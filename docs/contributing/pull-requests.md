@@ -4,10 +4,8 @@
 
 Before pushing, confirm:
 
-- The feature or fix is complete (no `TODO` markers in code paths reviewers
-  care about).
-- Tests added or updated; evidence attached (local runs and/or
-  **MPAS-Model-CI** dispatch / cross-repo runs) — see [Testing](testing.md).
+- The feature or fix is complete (no `TODO` markers in code paths CI runs).
+- Tests added or updated; CI subsets pass — see [Testing](testing.md).
 - The User's Guide is updated if you changed namelist options, stream
   defaults, or build flags.
 
@@ -21,7 +19,7 @@ What this PR changes, in 2–3 sentences.
 - [ ] Bug fix · [ ] Feature · [ ] Performance · [ ] Docs · [ ] Refactor
 
 ## Testing
-- [ ] MPAS-Model-CI subset / cross-repo run passed (or equivalent evidence)
+- [ ] CPU CI subsets pass
 - [ ] ECT (if science-affecting) / BFB (if exactly equivalent)
 - [ ] Performance numbers attached (if optimization)
 
