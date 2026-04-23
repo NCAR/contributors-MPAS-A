@@ -16,19 +16,17 @@ validation logic live in the reusable workflows and composite actions.
 
 | Class | Trigger | Notes |
 |-------|---------|-------|
-| `test-*-mpich` | push/PR to `master`, `develop`, `hackathon-*` | Primary PR gate |
+| `test-*-mpich` | push/PR to `master`, `develop` | Primary PR gate |
 | `test-*-openmpi` | dispatch | OpenMPI in containers is noisy |
 | `test-gpu-*` | dispatch | Self-hosted CIRRUS — security boundary |
 | `compile-nvhpc-cuda-mpich` | push/PR | OpenACC/CUDA toolchain check, no GPU |
 | `ect-test` | push to `master`; dispatch | Standalone ECT (GCC + OpenMPI, 120 km, GitHub-hosted) |
-| `bfb-*` (CPU) | dispatch; some on push to `hackathon-*` | Bit-for-bit |
+| `bfb-*` (CPU) | dispatch; some callers also enable `push` on specific branches | Bit-for-bit — see each YAML |
 | `bfb-*-gpu`, `bfb-nvhpc-cpu-vs-gpu`, `profile-gpu-nsight` | dispatch | Inherit GPU policy |
 | `coverage` | push to `master` | GCC coverage to Codecov |
 | `unit-tests` | push/PR | pFUnit across GCC 12/13/14 |
 
-Branches matching **`hackathon-*`** auto-run the CPU ECT subsets — useful
-for running the full gauntlet before opening a PR. Exact `on:` blocks live
-in each workflow YAML.
+Exact `on:` blocks live in each workflow YAML.
 
 ## Cross-repo testing
 
