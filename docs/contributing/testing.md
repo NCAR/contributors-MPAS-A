@@ -1,8 +1,6 @@
 # Testing
 
-Every non-trivial change needs some form of test. The goal isn't coverage
-for its own sake — it's that your change still works in six months when
-somebody refactors nearby code.
+Did you test your changes? Please at least include the test in your commit/PR documentation, and try to contribute the test if possible.
 
 ## Test types
 

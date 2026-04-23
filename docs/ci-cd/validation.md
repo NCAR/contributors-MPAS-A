@@ -37,7 +37,7 @@ ECT runs in two places:
 
 ### Running ECT outside containers
 
-ECT can be reproduced on Derecho, Cheyenne, or anywhere with PyCECT. You
+ECT can be reproduced on Derecho or other systems with PyCECT installed. You
 need the 120 km test archive (matching `RELEASE_TESTDATA_120KM`), the
 ensemble summary (`RELEASE_ECT`), and the `perturb_theta.py` /
 `trim_history.py` scripts in
