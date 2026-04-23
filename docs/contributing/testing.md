@@ -23,16 +23,15 @@ under `tests/unit/` in
 `unit-tests.yml` across GCC 12/13/14. Follow existing tests like
 `test_spline_interpolation.pf` for style.
 
-## What CI runs on your PR
+## Automated testing (MPAS-Model-CI)
 
-Automatic on push and PR to `master` or `develop`:
-
-- **CPU subsets** — GCC, Intel, NVHPC builds with MPICH plus 3-member ECT
-- **NVHPC + CUDA compile-only** — catches GPU toolchain breakage without a GPU
-- **pFUnit unit tests**
-
-Pushes to `master` also run **coverage**. OpenMPI variants, full GPU ECT,
-BFB, and Nsight profiling are dispatch-only.
+Automated testing is being developed in
+[**NCAR/MPAS-Model-CI**](https://github.com/NCAR/MPAS-Model-CI), a **GitHub
+fork** of [**MPAS-Dev/MPAS-Model**](https://github.com/MPAS-Dev/MPAS-Model)
+where workflows, containers, and test assets live separately from the
+upstream model tree. For what runs today, how triggers are wired, and how
+to invoke jobs, see the [**CI/CD overview**](../ci-cd/index.md) in this
+guide.
 
 Start jobs from
 [MPAS-Model-CI Actions](https://github.com/NCAR/MPAS-Model-CI/actions), or

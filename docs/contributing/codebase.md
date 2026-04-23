@@ -15,7 +15,11 @@ MPAS-Model/
 └── default_inputs/
 ```
 
+Browse the live tree: [MPAS-Dev/MPAS-Model](https://github.com/MPAS-Dev/MPAS-Model/tree/develop) (`develop`).
+
 ## `core_atmosphere`
+
+Live sources under [`src/core_atmosphere/`](https://github.com/MPAS-Dev/MPAS-Model/tree/develop/src/core_atmosphere) on GitHub.
 
 ```
 core_atmosphere/
@@ -31,7 +35,9 @@ core_atmosphere/
 The `chemistry/` subtree is scaffolding for CheMPAS-A; modules under
 `musica/` are stubs that activate only when MPAS is linked against
 [MUSICA-Fortran](https://github.com/NCAR/musica). The `&musica` namelist
-group is added to `namelist.atmosphere` in that build.
+group is added to `namelist.atmosphere` in that build. Options in
+`namelist.atmosphere` (and other model namelist groups) are documented in
+the [MPAS-A User's Guide, Appendix B: Model namelist options](https://www2.mmm.ucar.edu/projects/mpas/site/documentation/users_guide/appB_model_namelist.html).
 
 ## Two executables
 
@@ -44,7 +50,8 @@ Code that needs to differ is conditionalized in `Registry.xml`.
 
 ## The Registry
 
-`Registry.xml` (one per core) is the single source of truth for namelist
-options, packages, dimensions, variables, streams, and structs. The
-build-time parser generates Fortran from it. Adding a namelist option,
-field, or output variable almost always starts with a Registry edit.
+[`Registry.xml`](https://github.com/MPAS-Dev/MPAS-Model/blob/develop/src/core_atmosphere/Registry.xml)
+(one per core) is the single source of truth for namelist options,
+packages, dimensions, variables, streams, and structs. The build-time
+parser generates Fortran from it. Adding a namelist option, field, or
+output variable almost always starts with a Registry edit.
