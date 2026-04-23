@@ -42,8 +42,10 @@ need the 120 km test archive (matching `RELEASE_TESTDATA_120KM`), the
 ensemble summary (`RELEASE_ECT`), and the `perturb_theta.py` /
 `trim_history.py` scripts in
 [`.github/actions/run-perturb-mpas/`](https://github.com/NCAR/MPAS-Model-CI/tree/master/.github/actions/run-perturb-mpas).
-Build double precision, copy the case into N working directories, perturb
-`theta`, run, trim history, then run `pyCECT.py` against the summary.
+Download the archives from the tag named in `ci-config.env` via the
+[**MPAS-Model-CI releases**](https://github.com/NCAR/MPAS-Model-CI/releases)
+page. Build double precision, copy the case into N working directories,
+perturb `theta`, run, trim history, then run `pyCECT.py` against the summary.
 
 ## Bit-for-bit (BFB)
 
