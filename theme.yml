@@ -1,1 +1,4 @@
-themes/NCAR_primary.yml
+# Default theme for local builds (Windows-friendly). On Read the Docs,
+# `make NCAR_primary-stylelinks` replaces this file with a symlink to the
+# same path, or `make arc_iframe-stylelinks` points it at arc_iframe.yml.
+INHERIT: themes/NCAR_primary.yml

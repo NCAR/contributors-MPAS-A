@@ -32,9 +32,25 @@ validation:
 # ----------- content ----------------
 # ------------------------------------
 nav:
-  - Home : index.md
-  - Contributing Guide: CONTRIBUTING.md
-  - CI/CD System: ci-cd.md
+  - Home: index.md
+  - Contributing:
+    - Overview: contributing/index.md
+    - Getting Started: contributing/getting-started.md
+    - Codebase Structure: contributing/codebase.md
+    - Development Workflows: contributing/workflows.md
+    - Code Standards: contributing/standards.md
+    - Things Not to Do: contributing/things-not-to-do.md
+    - Testing: contributing/testing.md
+    - Commit Messages: contributing/commits.md
+    - Pull Requests & Review: contributing/pull-requests.md
+    - Getting Help: contributing/help.md
+  - CI/CD:
+    - Overview: ci-cd/index.md
+    - Workflows & Triggers: ci-cd/workflows.md
+    - Validation (ECT & BFB): ci-cd/validation.md
+    - GPU & Profiling: ci-cd/gpu.md
+    - Containers & Configuration: ci-cd/containers.md
+    - Extending CI: ci-cd/extending.md
 
 # ------------------------------------
 # -- configuration - themes
@@ -142,6 +158,8 @@ plugins:
   - redirects:
       redirect_maps:
         'nhug/index.md': 'https://nhug.readthedocs.io/en/latest/'
+        'CONTRIBUTING.md': 'contributing/index.md'
+        'ci-cd.md': 'ci-cd/index.md'
 
 # ------------------------------------
 # -- configuration - extras
