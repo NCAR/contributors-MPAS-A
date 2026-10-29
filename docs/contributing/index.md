@@ -23,7 +23,7 @@ to merged PR.
 - [Code Standards](standards.md) — Fortran conventions, FORD docstrings,
   formatting.
 - [Things Not to Do](things-not-to-do.md) — common patterns to avoid.
-- [Testing](testing.md) — what CI runs and what to add for new code.
+- [Testing](testing.md) — test types and what to add for new code.
 - [Commit Messages](commits.md) — what to write in `git log`.
 
 ## Review and help

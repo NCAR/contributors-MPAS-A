@@ -2,10 +2,10 @@
 
 ## Opening a PR
 
-Before pushing, confirm:
+Before you open a PR, check that:
 
-- The feature or fix is complete (no `TODO` markers in code paths CI runs).
-- Tests added or updated; CI subsets pass — see [Testing](testing.md).
+- The feature or fix is complete.
+- You've tested the change and can describe how — see [Testing](testing.md).
 - The User's Guide is updated if you changed namelist options, stream
   defaults, or build flags.
 
@@ -19,7 +19,7 @@ What this PR changes, in 2–3 sentences.
 - [ ] Bug fix · [ ] Feature · [ ] Performance · [ ] Docs · [ ] Refactor
 
 ## Testing
-- [ ] CPU CI subsets pass
+- [ ] Tests you ran, and how you know the change is correct
 - [ ] ECT (if science-affecting) / BFB (if exactly equivalent)
 - [ ] Performance numbers attached (if optimization)
 
@@ -27,12 +27,12 @@ What this PR changes, in 2–3 sentences.
 Closes #NNN
 ```
 
-For namelist or output changes, mention new namelist group/option names and
-their defaults — that's exactly what downstream users grep for.
+If you add namelist or output changes, please mention the new group/option
+names and their defaults — downstream users search for exactly these.
 
 ## Reviewing
 
-When reviewing, check:
+When you review, look at:
 
 - **Correctness** — logic matches stated intent? Edge cases? Units?
 - **Tests** — does the test actually exercise the change? Could it pass
@@ -42,13 +42,13 @@ When reviewing, check:
 - **Documentation** — public interfaces have FORD docstrings; namelist
   additions are reflected in the User's Guide PR or issue.
 
-Be specific in comments — quote the line and propose the change. Reserve
-"blocking" feedback for correctness and test gaps; mark style nits as such.
+Specific comments are the most helpful: quote the line and propose a change.
+Reserve "blocking" for correctness and test gaps, and label style nits as nits.
 
 ## After review
 
-Address each comment with either a code change or a reply explaining why
-the existing approach is correct. Don't squash review feedback into a
-single "address comments" commit — keep fix commits visible. **Don't
-force-push** unless rebasing onto a moved `develop`, and leave a note when
-you do.
+Please respond to each comment, either with a code change or a short
+explanation of why the existing approach works. Keep fix commits visible
+rather than squashing review feedback into one "address comments" commit.
+**Avoid force-pushing** unless you're rebasing onto a moved `develop`, and
+leave a note if you do.
