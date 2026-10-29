@@ -21,8 +21,7 @@ existing ones in `core_atmosphere/physics/`; new diagnostics live under
 `diagnostics/`.
 
 Default namelist values should preserve current behavior. Adding a field
-to the default `output` stream needs justification — v8.4.0 *removed* PV
-diagnostics and cut history file size by ~20%.
+to the default `output` stream needs justification.
 
 User-facing changes need an update to the
 [User's Guide](https://www2.mmm.ucar.edu/projects/mpas/site/documentation/users_guide.html);
@@ -31,15 +30,13 @@ covered in [Testing](testing.md).
 
 ## Bug fixes
 
-Reproduce the bug with a minimal failing case before fixing it. Note the
-compiler and version in the commit message if it's compiler-specific. Make
-the smallest change that works — don't bundle refactors. Add a regression
-test where you can, and describe in the PR how you reproduced and verified the fix.
+Note the compiler and version in the commit message if it's compiler-specific.
+How did you find it? When fixing, try to make the smallest change that works
+and submit it as a stand-alone PR.
 
 ## Optimization
 
-Profile first. Don't change anything for a hotspot worth less than ~5% of
-total time. Establish a baseline (runtime, memory, scaling on a
+Profile first. Establish a baseline (runtime, memory, scaling on a
 representative case), optimize one axis at a time, and measure after each
 change. Verify correctness with ECT or BFB —
 [Validation](../ci-cd/validation.md).
@@ -67,5 +64,4 @@ end do
 !$acc end parallel loop
 ```
 
-Build with `OPENACC=true`. Validate against the CPU output with ECT, then
-measure speedup.
+Build with `OPENACC=true`. Validate against the CPU output.
