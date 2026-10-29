@@ -4,20 +4,26 @@ The commit message is the only durable record of *why* a change exists.
 The diff shows what changed; the message explains everything else.
 
 Treat the first ~80 characters as if they'll appear in `git log --oneline`
-forever — because they will. Get grep-able terms in there: module or
-routine names, compiler/version when relevant, kind of change.
+forever. Use searchable terms in there, things like module or routine names,
+compiler/version when relevant, kind of change, etc.
+
+Start the subject line with a prefix that says what kind of change it is:
+`debug:` for a bug fix, `optimize:` for a performance or memory improvement,
+`feature:` for new functionality, or another label that fits. This answers the
+"what did you actually do?" question up front and makes `git log --oneline`
+easy to scan.
 
 The body should answer:
 
 - What was the original problem or requirement?
-- What did you actually do?
-- What surprised you while debugging? (compiler quirks, environment, edges)
-- What's the measurable impact? (memory saved, speedup, test that now passes)
+- What did you actually do? Is this an optimization or a new feature or a debug?
+- What testing did you perform so that you're confident it's correct?
+- What's the measurable impact, based on your testing? (memory saved, speedup, test that now passes)
 
 ## Example
 
 ```
-Fix memory leak in mpas_atm_core temperature cleanup (gfortran-11.3.0)
+debug: fix memory leak in mpas_atm_core temperature cleanup (gfortran-11.3.0)
 
 The temperature array in mpas_atm_core_finalize was conditionally double-
 deallocated when both physics and dynamics finalize ran in the same
@@ -28,7 +34,8 @@ Valgrind pointed at the second deallocate; the first had already cleared
 the pointer via shared cleanup logic. Guarding the second deallocate with
 `allocated()` fixes it.
 
-Validated on the same case (memory now flat); all standard ECT subsets pass.
+Validated on the same case: memory now flat, and output passes a
+bit-for-bit comparison against the baseline.
 ```
 
 ## Searching history
