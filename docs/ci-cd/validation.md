@@ -29,11 +29,10 @@ list at `.github/data/ect_excluded_vars.txt`.
 ECT runs in two places:
 
 - **Inside `_test-compiler.yml`**, alongside each compiler/MPI build, on
-  every push and PR.
-- **Standalone (`ect-test.yml`)** on every push to `master` and on
+  every push and PR to MPAS-Model-CI.
+- **Standalone (`ect-test.yml`)** on every push to MPAS-Model-CI `master` and on
   dispatch — GCC + OpenMPI on the 120 km mesh from a cached spin-up
-  restart, runnable against an external `mpas-repository`/`mpas-ref` for
-  testing arbitrary commits.
+  restart.
 
 ### Running ECT outside containers
 

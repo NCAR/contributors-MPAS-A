@@ -34,7 +34,7 @@ covered in [Testing](testing.md).
 Reproduce the bug with a minimal failing case before fixing it. Note the
 compiler and version in the commit message if it's compiler-specific. Make
 the smallest change that works — don't bundle refactors. Add a regression
-test or, at minimum, a CI variant that would have caught it.
+test where you can, and describe in the PR how you reproduced and verified the fix.
 
 ## Optimization
 
@@ -68,6 +68,4 @@ end do
 ```
 
 Build with `OPENACC=true`. Validate against the CPU output with ECT, then
-measure speedup. The `compile-nvhpc-cuda-mpich` workflow checks OpenACC
-syntax on every PR without a GPU; full GPU runs are dispatch-only —
-[GPU & Profiling](../ci-cd/gpu.md).
+measure speedup.

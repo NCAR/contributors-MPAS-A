@@ -159,7 +159,6 @@ plugins:
       redirect_maps:
         'nhug/index.md': 'https://nhug.readthedocs.io/en/latest/'
         'CONTRIBUTING.md': 'contributing/index.md'
-        'ci-cd.md': 'ci-cd/index.md'
 
 # ------------------------------------
 # -- configuration - extras

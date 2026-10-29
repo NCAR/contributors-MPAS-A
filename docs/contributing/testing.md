@@ -2,6 +2,8 @@
 
 Did you test your changes? Please at least include the test in your commit/PR documentation, and try to contribute the test if possible.
 
+Please report the tests you ran in the PR.
+
 ## Test types
 
 | Type | What it does | Use for |
@@ -29,11 +31,4 @@ Automated testing is being developed in
 [**NCAR/MPAS-Model-CI**](https://github.com/NCAR/MPAS-Model-CI), a **GitHub
 fork** of [**MPAS-Dev/MPAS-Model**](https://github.com/MPAS-Dev/MPAS-Model)
 where workflows, containers, and test assets live separately from the
-upstream model tree. For what runs today, how triggers are wired, and how
-to invoke jobs, see the [**CI/CD overview**](../ci-cd/index.md) in this
-guide.
-
-Start jobs from
-[MPAS-Model-CI Actions](https://github.com/NCAR/MPAS-Model-CI/actions), or
-see [Cross-repo testing](../ci-cd/workflows.md#cross-repo-testing) to run
-against a specific fork and ref.
+upstream model tree. Documentation for it is being updated.
