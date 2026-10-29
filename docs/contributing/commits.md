@@ -38,19 +38,8 @@ Validated on the same case: memory now flat, and output passes a
 bit-for-bit comparison against the baseline.
 ```
 
-## Searching history
+## Things not to do
 
-Well-structured messages turn `git log --grep` into a real tool:
-
-```bash
-git log --grep="mpas_atm_core"          # changes to a module
-git log --grep="gfortran"               # compiler-specific work
-git log --grep="OpenACC\|GPU\|CUDA"     # GPU-related changes
-```
-
-## Anti-patterns
-
-- `Fix bug` / `Update` / `Changes` — communicates nothing
-- A 200-line diff under a one-line subject — the body is where value lives
-- Unrelated changes in one commit — splits the history's signal
+- Commit messages that just say "Fix bug"
+- Unrelated changes in one commit
 - Authorship comments inside the code (`! Modified by ABC on …`) — git tracks that
