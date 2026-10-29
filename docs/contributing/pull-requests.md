@@ -20,7 +20,6 @@ What this PR changes, in 2–3 sentences.
 
 ## Testing
 - [ ] Tests you ran, and how you know the change is correct
-- [ ] ECT (if science-affecting) / BFB (if exactly equivalent)
 - [ ] Performance numbers attached (if optimization)
 
 ## Related issues
